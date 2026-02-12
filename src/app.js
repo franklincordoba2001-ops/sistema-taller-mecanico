@@ -6,6 +6,7 @@ require('./config/db');
 const clienteRoutes = require('./routes/clienteRoutes');
 const motoRoutes = require('./routes/motoRoutes');
 const ordenRoutes = require('./routes/ordenRoutes');
+const facturaRoutes = require('./routes/facturaRoutes');
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/api/clientes', clienteRoutes);
 app.use('/api/motos', motoRoutes);
 app.use('/api/ordenes', ordenRoutes);
+app.use('/api/facturas', facturaRoutes);
 
 
 app.get('/', (req, res) => {
