@@ -9,5 +9,5 @@ router.post('/', facturaController.createFactura);
 router.delete('/:id', facturaController.deleteFactura);
 router.get('/', verifyToken, facturaController.getFacturas);
 router.post('/', verifyToken, facturaController.createFactura);
-
+router.get('/:id/pdf', verifyToken, facturaController.generarFacturaPDF);
 module.exports = router;

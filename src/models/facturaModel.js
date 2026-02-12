@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// Obtener todas las facturas con información completa
+// --- ESTA ES LA FUNCIÓN QUE FALTABA ---
 const getAllFacturas = async () => {
   const [rows] = await db.query(`
     SELECT 
@@ -8,8 +8,25 @@ const getAllFacturas = async () => {
       f.fecha,
       f.total,
       f.metodo_pago,
+      o.descripcion AS orden_descripcion,
+      c.nombre AS cliente_nombre
+    FROM facturas f
+    JOIN ordenes_servicio o ON f.orden_id = o.id
+    JOIN motos m ON o.moto_id = m.id
+    JOIN clientes c ON m.cliente_id = c.id
+  `);
+  return rows;
+};
+
+// Obtener factura completa con joins
+const getFacturaCompletaById = async (id) => {
+  const [rows] = await db.query(`
+    SELECT 
+      f.id AS factura_id,
+      f.fecha,
+      f.total,
+      f.metodo_pago,
       o.descripcion,
-      o.estado,
       m.placa,
       m.marca,
       m.modelo,
@@ -19,8 +36,9 @@ const getAllFacturas = async () => {
     JOIN ordenes_servicio o ON f.orden_id = o.id
     JOIN motos m ON o.moto_id = m.id
     JOIN clientes c ON m.cliente_id = c.id
-  `);
-  return rows;
+    WHERE f.id = ?
+  `, [id]);
+  return rows[0];
 };
 
 // Obtener factura por ID
@@ -35,18 +53,15 @@ const getFacturaById = async (id) => {
 // Crear factura
 const createFactura = async (orden_id, fecha, total, metodo_pago) => {
   const connection = await db.getConnection();
-
   try {
     await connection.beginTransaction();
 
-    // Insertar factura
     const [result] = await connection.query(
       `INSERT INTO facturas (orden_id, fecha, total, metodo_pago)
        VALUES (?, ?, ?, ?)`,
       [orden_id, fecha, total, metodo_pago]
     );
 
-    // Actualizar estado de la orden
     await connection.query(
       `UPDATE ordenes_servicio 
        SET estado = 'entregado'
@@ -55,9 +70,7 @@ const createFactura = async (orden_id, fecha, total, metodo_pago) => {
     );
 
     await connection.commit();
-
     return result;
-
   } catch (error) {
     await connection.rollback();
     throw error;
@@ -76,8 +89,9 @@ const deleteFactura = async (id) => {
 };
 
 module.exports = {
-  getAllFacturas,
+  getAllFacturas, // Ahora sí existe arriba
   getFacturaById,
   createFactura,
-  deleteFactura
+  deleteFactura,
+  getFacturaCompletaById
 };
