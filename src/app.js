@@ -4,16 +4,19 @@ require('dotenv').config();
 require('./config/db');
 
 const clienteRoutes = require('./routes/clienteRoutes');
+const motoRoutes = require('./routes/motoRoutes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+// Rutas
 app.use('/api/clientes', clienteRoutes);
+app.use('/api/motos', motoRoutes);
+
 
 app.get('/', (req, res) => {
-    res.send('API Taller Mecánico funcionando 🚀');
+    res.send('API Taller Mecánico funcionando correctamente');
 });
 
 const PORT = process.env.PORT || 3000;
