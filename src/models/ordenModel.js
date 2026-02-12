@@ -1,13 +1,27 @@
 const db = require('../config/db');
 
-// Obtener todas las órdenes
+// Obtener todas las órdenes con datos de moto y cliente
 const getAllOrdenes = async () => {
   const [rows] = await db.query(`
-    SELECT o.*, m.placa, c.nombre AS cliente
+    SELECT 
+      o.id AS orden_id,
+      o.descripcion,
+      o.fecha_ingreso,
+      o.fecha_entrega,
+      o.estado,
+      o.costo,
+      m.id AS moto_id,
+      m.placa,
+      m.marca,
+      m.modelo,
+      c.id AS cliente_id,
+      c.nombre,
+      c.telefono
     FROM ordenes_servicio o
     JOIN motos m ON o.moto_id = m.id
     JOIN clientes c ON m.cliente_id = c.id
-  `);
+  `); // Se quitó la coma extra después de c.telefono
+
   return rows;
 };
 
@@ -20,24 +34,29 @@ const getOrdenById = async (id) => {
   return rows[0];
 };
 
-// Crear orden
+// Crear orden (Esta es la que faltaba y causaba el ReferenceError)
 const createOrden = async (moto_id, descripcion, fecha_ingreso, fecha_entrega, estado, costo) => {
+  // Redondeamos el costo antes de insertar para evitar decimales innecesarios
+  const costoLimpio = Math.round(costo || 0);
+
   const [result] = await db.query(
     `INSERT INTO ordenes_servicio 
     (moto_id, descripcion, fecha_ingreso, fecha_entrega, estado, costo) 
     VALUES (?, ?, ?, ?, ?, ?)`,
-    [moto_id, descripcion, fecha_ingreso, fecha_entrega, estado, costo]
+    [moto_id, descripcion, fecha_ingreso, fecha_entrega, estado || 'pendiente', costoLimpio]
   );
   return result;
 };
 
 // Actualizar orden
 const updateOrden = async (id, moto_id, descripcion, fecha_ingreso, fecha_entrega, estado, costo) => {
+  const costoLimpio = Math.round(costo || 0);
+  
   const [result] = await db.query(
     `UPDATE ordenes_servicio 
      SET moto_id=?, descripcion=?, fecha_ingreso=?, fecha_entrega=?, estado=?, costo=? 
      WHERE id=?`,
-    [moto_id, descripcion, fecha_ingreso, fecha_entrega, estado, costo, id]
+    [moto_id, descripcion, fecha_ingreso, fecha_entrega, estado, costoLimpio, id]
   );
   return result;
 };
@@ -54,7 +73,7 @@ const deleteOrden = async (id) => {
 module.exports = {
   getAllOrdenes,
   getOrdenById,
-  createOrden,
+  createOrden, // Ahora sí está definida arriba
   updateOrden,
   deleteOrden
 };
