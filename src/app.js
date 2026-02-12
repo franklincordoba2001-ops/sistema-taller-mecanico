@@ -8,6 +8,7 @@ const motoRoutes = require('./routes/motoRoutes');
 const ordenRoutes = require('./routes/ordenRoutes');
 const facturaRoutes = require('./routes/facturaRoutes');
 const authRoutes = require('./routes/authRoutes');
+const reporteRoutes = require('./routes/reporteRoutes');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use('/api/motos', motoRoutes);
 app.use('/api/ordenes', ordenRoutes);
 app.use('/api/facturas', facturaRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/reportes', reporteRoutes);
 
 
 app.get('/', (req, res) => {
