@@ -40,10 +40,15 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email },
-      SECRET_KEY,
-      { expiresIn: "2h" }
-    );
+  { 
+    id: user.id, 
+    email: user.email,
+    role: user.role   // 👈 agregamos el rol
+  },
+  SECRET_KEY,
+  { expiresIn: "2h" }
+);
+
 
     res.json({
       message: "Login exitoso",
